@@ -9,6 +9,8 @@
   stdenv,
   lib,
   passthru,
+  numactl,
+  elfutils,
 }:
 let
   src = fetchurl { inherit url hash; };
@@ -24,7 +26,11 @@ appimageTools.wrapType2 {
     passthru
     ;
 
-  extraPkgs = pkgs: [ pkgs.ocl-icd ];
+  extraPkgs = pkgs: [
+    pkgs.ocl-icd
+    pkgs.numactl
+    pkgs.elfutils
+  ];
 
   extraInstallCommands = ''
     mkdir -p $out/share/applications
@@ -42,7 +48,11 @@ appimageTools.wrapType2 {
 
     patchelf --set-interpreter "${stdenv.cc.bintools.dynamicLinker}" \
     --set-rpath "${lib.getLib stdenv.cc.cc}/lib:${lib.getLib stdenv.cc.cc}/lib64:$out/lib:${
-      lib.makeLibraryPath [ (lib.getLib stdenv.cc.cc) ]
+      lib.makeLibraryPath [
+        (lib.getLib stdenv.cc.cc)
+        numactl
+        elfutils
+      ]
     }" $out/bin/lms
   '';
 }
