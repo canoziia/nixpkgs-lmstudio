@@ -34,7 +34,14 @@ appimageTools.wrapType2 {
 
   extraInstallCommands = ''
     mkdir -p $out/share/applications
-    cp -r ${appimageContents}/usr/share/icons $out/share
+    if [ -d "${appimageContents}/usr/share/icons" ]; then
+      cp -r ${appimageContents}/usr/share/icons $out/share
+    elif [ -f "${appimageContents}/lm-studio.png" ]; then
+      install -m 444 -D ${appimageContents}/lm-studio.png $out/share/icons/hicolor/512x512/apps/lm-studio.png
+    elif [ -f "${appimageContents}/.DirIcon" ]; then
+      install -m 444 -D ${appimageContents}/.DirIcon $out/share/icons/hicolor/512x512/apps/lm-studio.png
+    fi
+
     install -m 444 -D ${appimageContents}/lm-studio.desktop -t $out/share/applications
 
     # Rename the main executable from lmstudio to lm-studio
